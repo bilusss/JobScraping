@@ -1,26 +1,45 @@
 import PracujPL
-import NoFluffJobs
-import JustJoinIT
-
+# import JustJoinIT
 from selenium import webdriver
 from selenium.webdriver.safari.service import Service as SafariService
-# from selenium.webdriver.chrome.service import Service as ChromeService
+from selenium.webdriver.safari.options import Options
+from multiprocessing import Process, Queue
 import time
 
-# Safari setup (macOS) - Uncomment the following lines if you want to use Safari
-service = SafariService()
-driver = webdriver.Safari(service=service)
-driver.maximize_window()
+def scrape_pracujpl(queue):
+    options = Options()
+    service = SafariService()
+    driver = webdriver.Safari(service=service, options=options)
+    driver.set_window_position(0, 0)
+    driver.set_window_size(1600, 1200)
+    result = PracujPL.scrape_job_listings(driver)
+    queue.put(result)
+    driver.quit()
 
-# Chrome setup (Windows) - Uncomment the following lines if you want to use Chrome
-# chrome_service = ChromeService(executable_path="path/to/chromedriver.exe")
-# driver = webdriver.Chrome(service=chrome_service)
-# driver.maximize_window()
+# def scrape_justjoinit(queue):
+#     options = Options()
+#     service = SafariService()
+#     driver = webdriver.Safari(service=service, options=options)
+#     driver.set_window_position(800, 0)
+#     driver.set_window_size(800, 600)
+#     result = JustJoinIT.scrape_job_listings(driver)
+#     queue.put(result)
+#     driver.quit()
 
-# PracujPL
-PracujPL.scrape_job_listings(driver)
+if __name__ == '__main__':
+    queue = Queue()
+    p1 = Process(target=scrape_pracujpl, args=(queue,))
+    # p2 = Process(target=scrape_justjoinit, args=(queue,))
 
+    p1.start()
+    # p2.start()
 
-time.sleep(10)
-# Zamknięcie przeglądarki
-# driver.quit()
+    # p1.join()
+    # p2.join()
+
+    # results = [queue.get() for _ in range(2)]
+    results = [queue.get() for _ in range(1)]
+    for res in results:
+        print(res)
+
+    print("All processes completed.")
