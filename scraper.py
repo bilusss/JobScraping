@@ -1,5 +1,5 @@
 import PracujPL
-# import JustJoinIT
+import JustJoinIT
 from selenium import webdriver
 from selenium.webdriver.safari.service import Service as SafariService
 from selenium.webdriver.safari.options import Options
@@ -11,28 +11,28 @@ def scrape_pracujpl(queue):
     service = SafariService()
     driver = webdriver.Safari(service=service, options=options)
     driver.set_window_position(0, 0)
-    driver.set_window_size(1600, 1200)
+    driver.set_window_size(800, 600)
     result = PracujPL.scrape_job_listings(driver)
     queue.put(result)
     driver.quit()
 
-# def scrape_justjoinit(queue):
-#     options = Options()
-#     service = SafariService()
-#     driver = webdriver.Safari(service=service, options=options)
-#     driver.set_window_position(800, 0)
-#     driver.set_window_size(800, 600)
-#     result = JustJoinIT.scrape_job_listings(driver)
-#     queue.put(result)
-#     driver.quit()
+def scrape_justjoinit(queue):
+    options = Options()
+    service = SafariService()
+    driver = webdriver.Safari(service=service, options=options)
+    driver.set_window_position(800, 0)
+    driver.set_window_size(800, 600)
+    result = JustJoinIT.scrape_job_listings(driver)
+    queue.put(result)
+    driver.quit()
 
 if __name__ == '__main__':
     queue = Queue()
-    p1 = Process(target=scrape_pracujpl, args=(queue,))
-    # p2 = Process(target=scrape_justjoinit, args=(queue,))
+    # p1 = Process(target=scrape_pracujpl, args=(queue,))
+    p2 = Process(target=scrape_justjoinit, args=(queue,))
 
-    p1.start()
-    # p2.start()
+    # p1.start()
+    p2.start()
 
     # p1.join()
     # p2.join()
