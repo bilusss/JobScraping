@@ -35,35 +35,32 @@ def scrape_job_listings(driver):
         # Wait for the page to load
         wait_for_page_load(driver)
         time.sleep(5)
-
         i = 0
         flag = False
-        # while not flag:
-        #     i += 1
-        #     # Getting job listings
-        #     job_listings = driver.find_elements(By.CSS_SELECTOR, "div.MuiBox-root.css-2kppws")
-        #     print(f"{i} Found {len(job_listings)} job listings.")
-        #     for job in job_listings:
-        #         try:
-        #             title = job.get_attribute("title")
-        #             href = job.get_attribute("href")
-        #             jobs.append([title, href])
-        #         except Exception as e:
-        #             print(f"Error extracting job details: {e}")
+        collected_data = set()
+        while i < 10 and not flag:
+            elements = driver.find_elements(By.XPATH, "//div[contains(@class, 'data-index')]")
+            print(elements)
+            last_height = driver.execute_script("return document.body.scrollHeight")
+            driver.execute_script("window.scrollBy(0, 50);")
+            for el in elements:
+                data = el.text
+                index = el.get_attribute("display_item_index")
+                if data not in collected_data:
+                    collected_data.add(data)
+                    print(f"Data: {data}, Index: {index}")
+            print(collected_data)
+            driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+            time.sleep(20)
+            new_height = driver.execute_script("return document.body.scrollHeight")
+            if new_height == last_height:
+                break
+                flag = True
+            last_height = new_height
+            i += 1
 
-        #     # Click the "Next" button
-        #     try:
-        #         if i != 1:
-        #             next_button = driver.find_element(By.XPATH, '//*[@id="offers-list"]/div[5]/div/button[2]')
-        #         else:
-        #             next_button = driver.find_element(By.XPATH, '//*[@id="offers-list"]/div[5]/div/button')
-        #         next_button.click()
-        #         wait_for_page_load(driver)
-        #         time.sleep(5)
-        #     except Exception as e:
-        #         print(f"End of the page: {e}")
-        #         flag = True
     finally:
+        print()
         df = pd.DataFrame(jobs, columns=pd.Index(["Title", "URL"]))
         df.to_csv("job_listings.csv", index=False)
         print("CSV file saved.")

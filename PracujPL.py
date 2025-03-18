@@ -23,7 +23,7 @@ def scrape_job_listings(driver):
         wait_for_page_load(driver)
 
         # Accepting cookies
-        cookies_xpath = '//*[@id="__next"]/div[5]/div/div/div[3]/div/button[1]'
+        cookies_xpath = '//*[@id="__next"]/div[4]/div/div/div[3]/div/button[1]'
         try:
             WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, cookies_xpath))).click()
             print("Cookies accepted.")
@@ -47,11 +47,19 @@ def scrape_job_listings(driver):
                 try:
                     title = job.get_attribute("title")
                     href = job.get_attribute("href")
-                    jobs.append([title, href])
+                    jobs.append([title[14:], href])
                 except Exception as e:
                     print(f"Error extracting job details: {e}")
 
-            # Click the "Next" button
+            # Click the "ok zamknij" button
+            przycisk_xpath = '//*[@id="popupContainer"]/div/div/div/button'
+            przyciski = driver.find_elements(By.XPATH, przycisk_xpath)
+            if przyciski:
+                przyciski[0].click()
+                print("Przycisk kliknięty.")
+            else:
+                print("Przycisk nie znaleziony.")
+
             try:
                 if i != 1:
                     next_button = driver.find_element(By.XPATH, '//*[@id="offers-list"]/div[5]/div/button[2]')

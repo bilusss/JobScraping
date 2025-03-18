@@ -28,11 +28,11 @@ def scrape_justjoinit(queue):
 
 if __name__ == '__main__':
     queue = Queue()
-    # p1 = Process(target=scrape_pracujpl, args=(queue,))
-    p2 = Process(target=scrape_justjoinit, args=(queue,))
+    p1 = Process(target=scrape_pracujpl, args=(queue,))
+    # p2 = Process(target=scrape_justjoinit, args=(queue,))
 
-    # p1.start()
-    p2.start()
+    p1.start()
+    # p2.start()
 
     # p1.join()
     # p2.join()
