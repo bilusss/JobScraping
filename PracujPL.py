@@ -35,7 +35,7 @@ def scrape_job_listings(driver):
         # Wait for the page to load
         wait_for_page_load(driver)
         time.sleep(5)
-
+        span_path = '//*[@id="offers-list"]/div[4]/div[4]/div/div/div[1]/div[2]/div[1]/div/span[2]'
         i = 0
         flag = False
         while not flag:
@@ -47,7 +47,15 @@ def scrape_job_listings(driver):
                 try:
                     title = job.get_attribute("title")
                     href = job.get_attribute("href")
-                    jobs.append([title[14:], href])
+
+                    try:
+                        span = job.find_element(By.XPATH, span_path)
+                        span_text = span.text
+                    except Exception:
+                        span_text = "Brak danych"
+                    #TODO: Dodaj tryb zatudnienia(stacjonary, zdalne, hybrydowe), lokalizacje, firme
+
+                    jobs.append([title[14:], span_text, href])
                 except Exception as e:
                     print(f"Error extracting job details: {e}")
 
@@ -72,7 +80,7 @@ def scrape_job_listings(driver):
                 print(f"End of the page: {e}")
                 flag = True
     finally:
-        df = pd.DataFrame(jobs, columns=pd.Index(["Title", "URL"]))
+        df = pd.DataFrame(jobs, columns=pd.Index(["Title", "Salary", "URL"]))
         df.to_csv("job_listings.csv", index=False)
         print("CSV file saved.")
         driver.quit()
